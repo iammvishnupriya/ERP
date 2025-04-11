@@ -1,4 +1,4 @@
-package com.erp.UserManagement.Model;
+package com.erp.UserManagement.Enum;
 
 public enum UserStatus {
     ACTIVE,

@@ -1,130 +1,86 @@
 package com.erp.UserManagement.ServiceImpl;
 
 
+import com.erp.UserManagement.Enum.UserStatus;
+import com.erp.UserManagement.Model.Department;
+import com.erp.UserManagement.Model.Role;
 import com.erp.UserManagement.Model.User;
-import com.erp.UserManagement.Model.UserRole;
-import com.erp.UserManagement.Model.UserStatus;
+import com.erp.UserManagement.Repository.DepartmentRepository;
+import com.erp.UserManagement.Repository.RoleRepository;
 import com.erp.UserManagement.Repository.UserRepository;
 import com.erp.UserManagement.Service.UserService;
+import com.erp.UserManagement.dto.AssignRoleDepartmentRequest;
 import com.erp.UserManagement.dto.UserDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.erp.UserManagement.dto.UserResponseDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+    private final DepartmentRepository departmentRepository;
 
-    public UserServiceImpl(PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, DepartmentRepository departmentRepository) {
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
+        this.departmentRepository = departmentRepository;
     }
 
-
-//    @Override
-//    public User registerUser(UserDto userDto) {
-//        User user = new User();
-//        user.setName(userDto.getName());
-//        user.setEmail(userDto.getEmail());
-//        user.setRole(UserRole.valueOf(userDto.getRole()));
-//        user.setStatus(UserStatus.valueOf(userDto.getStatus()));
-//        return userRepository.save(user);
-//    }
-
     @Override
-    public User registerUser(UserDto userDto) {
+    public UserResponseDto registerUser(UserDto userDto) {
         User user = new User();
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRole(userDto.getRole());
-        user.setStatus(userDto.getStatus());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));  // ✅ Encrypt password
+        user.setPhone(userDto.getPhone());
+        user.setAddress(userDto.getAddress());
+        user.setPassword(passwordEncoder.encode("123")); // default password
+        user.setStatus(UserStatus.ACTIVE);
 
-        return userRepository.save(user);
-    }
-
+        userRepository.save(user);
 
 
-
-    @Override
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-    }
-
-    @Override
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        UserResponseDto response = new UserResponseDto();
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setPhone(user.getPhone());
+        response.setAddress(user.getAddress());
+        return response;
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+    public UserResponseDto assignRoleAndDepartment(int userId, AssignRoleDepartmentRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-//    @Override
-//    public User updateUser(Long id, UserDto userDto) {
-//        User user = getUserById(id);
-//        user.setName(userDto.getName());
-//        user.setRole(userDto.getRole());
-//        user.setStatus(userDto.getStatus());
-//        return userRepository.save(user);
-//    }
+        Role role = roleRepository.findById(request.getRoleId())
+                .orElseThrow(() -> new RuntimeException("Role not found"));
 
-    @Override
-    public User updateUser(Long id, UserDto userDto) {
-        Optional<User> existingUserOptional = userRepository.findById(id);
+        user.setRole(role);
 
-        if (existingUserOptional.isEmpty()) {
-            throw new RuntimeException("User not found with ID: " + id);
+        try {
+            Department department = departmentRepository.findByName(request.getDepartmentName())
+                    .orElseThrow(() -> new RuntimeException("Department not found"));
+            user.setDepartment(department);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid department: " + request.getDepartmentName());
         }
 
-        User existingUser = existingUserOptional.get();
+        userRepository.save(user);
 
-        // Updating the fields only if new values are provided
-        if (userDto.getName() != null) {
-            existingUser.setName(userDto.getName());
-        }
-        if (userDto.getEmail() != null) {
-            existingUser.setEmail(userDto.getEmail());
-        }
-        if (userDto.getRole() != null) {
-            existingUser.setRole(userDto.getRole());
-        }
-        if (userDto.getStatus() != null) {
-            existingUser.setStatus(userDto.getStatus());
-        }
-        if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
-            existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        }
-
-        return userRepository.save(existingUser);
-    }
-
-    @Override
-    public boolean authenticate(String email, String password) {
-        // Fetch user by email
-        Optional<User> user = userRepository.findByEmail(email);
-
-        // Check if the user doesn't exist
-        if (user.isEmpty()) {
-            return false; // User doesn't exist
-        }
-
-        // Check if the provided password matches the stored password
-        return passwordEncoder.matches(password, user.get().getPassword());
+        UserResponseDto response = new UserResponseDto();
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setPhone(user.getPhone());
+        response.setAddress(user.getAddress());
+        return response;
     }
 
 
 
-    @Override
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
+
+
 }

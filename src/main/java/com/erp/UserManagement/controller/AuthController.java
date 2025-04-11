@@ -1,54 +1,36 @@
 package com.erp.UserManagement.controller;
 
-import com.erp.UserManagement.Model.User;
-import com.erp.UserManagement.Repository.UserRepository;
-import com.erp.UserManagement.Security.JwtUtil;
+import com.erp.UserManagement.Response.SuccessResponse;
+import com.erp.UserManagement.Service.AuthService;
+import com.erp.UserManagement.dto.ChangePasswordRequest;
 import com.erp.UserManagement.dto.LoginRequest;
 import com.erp.UserManagement.dto.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private final UserRepository userRepository;
+    private final AuthService authService;
 
     @Autowired
-    private final JwtUtil jwtUtil;
-
-    @Autowired
-    private final AuthenticationManager authenticationManager;
-
-    @Autowired
-    public AuthController(UserRepository userRepository, JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
-        this.userRepository = userRepository;
-        this.jwtUtil = jwtUtil;
-        this.authenticationManager = authenticationManager;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+    public SuccessResponse<LoginResponse> login(@RequestBody LoginRequest request) {
+        return authService.login(request);
+    }
 
-
-        );
-
-        System.out.println("Authenticated User: " + authentication.getPrincipal());
-
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // ✅ Generate JWT Token
-        String token = jwtUtil.generateToken(user);
-
-        // ✅ Return token and role
-        return ResponseEntity.ok(new LoginResponse(token, user.getRole().name()));
+    @GetMapping("/validate")
+    public SuccessResponse<Boolean> validateToken(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return new SuccessResponse<>(200,"Invalid token header", false);
+        }
+        String token = authHeader.substring(7);
+        return authService.validateToken(token);
     }
 }
