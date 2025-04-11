@@ -2,6 +2,7 @@ package com.erp.UserManagement.controller;
 
 import com.erp.UserManagement.Response.SuccessResponse;
 import com.erp.UserManagement.Service.AuthService;
+import com.erp.UserManagement.dto.ChangePasswordRequest;
 import com.erp.UserManagement.dto.LoginRequest;
 import com.erp.UserManagement.dto.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,5 +32,10 @@ public class AuthController {
         }
         String token = authHeader.substring(7);
         return authService.validateToken(token);
+    }
+
+    @PostMapping("/change-password")
+    public SuccessResponse<String> updatePassword(@RequestBody ChangePasswordRequest request) {
+        return authService.changePassword(request);
     }
 }

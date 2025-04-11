@@ -88,4 +88,24 @@ public class AuthServiceImpl implements AuthService {
             return new SuccessResponse<>(200,"Invalid token", false);
         }
     }
+
+    @Override
+    public SuccessResponse<String> changePassword(ChangePasswordRequest request) {
+        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+        if (optionalUser.isEmpty()) {
+            return new SuccessResponse<>(404, "User not found", null);
+        }
+
+        User user = optionalUser.get();
+        if (!PasswordHasher.matches(request.getOldPassword(), user.getPassword())) {
+            return new SuccessResponse<>(400, "Old password is incorrect", null);
+        }
+
+        user.setPassword(PasswordHasher.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        return new SuccessResponse<>(200, "Password updated successfully", null);
+    }
+
+
 }
