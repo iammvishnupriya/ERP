@@ -2,7 +2,6 @@ package com.erp.UserManagement.controller;
 
 import com.erp.UserManagement.Response.SuccessResponse;
 import com.erp.UserManagement.Service.AuthService;
-import com.erp.UserManagement.dto.ChangePasswordRequest;
 import com.erp.UserManagement.dto.LoginRequest;
 import com.erp.UserManagement.dto.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
