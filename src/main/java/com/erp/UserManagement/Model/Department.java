@@ -15,6 +15,12 @@ public class Department {
     @Column(nullable = false, unique = true)
     private String name;
 
+    public  Department(){}
+    public Department(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     // Getters and Setters
     public Integer getId() {
         return id;

@@ -10,7 +10,10 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String name; // e.g. "ADMIN", "SALES_MANAGER"
+    private String name;// e.g. "ADMIN", "SALES_MANAGER"
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department department;
 
     public Integer getId() {
         return id;
@@ -26,6 +29,14 @@ public class Role {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 }
 

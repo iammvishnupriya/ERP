@@ -11,7 +11,7 @@ public class SuccessResponse<T> {
     private int statusCode;
     private String statusMessage;
     private T data;
-
+    public SuccessResponse(){}
     public SuccessResponse(int statusCode, String statusMessage, T data) {
         this.statusCode = statusCode;
         this.statusMessage = statusMessage;

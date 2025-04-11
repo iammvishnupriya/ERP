@@ -1,11 +1,14 @@
 package com.erp.UserManagement.controller;
 
+import com.erp.UserManagement.Model.Department;
+import com.erp.UserManagement.Model.Role;
 import com.erp.UserManagement.Model.User;
 import com.erp.UserManagement.Response.SuccessResponse;
 import com.erp.UserManagement.Security.CustomUserDetailsService;
 import com.erp.UserManagement.Security.JwtUtil;
 import com.erp.UserManagement.Service.UserService;
 import com.erp.UserManagement.dto.AssignRoleDepartmentRequest;
+import com.erp.UserManagement.dto.RoleDTO;
 import com.erp.UserManagement.dto.UserDto;
 import com.erp.UserManagement.dto.UserResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +46,18 @@ public class UserController {
                 new SuccessResponse<>(200, "Role and department assigned successfully", responseDto)
         );
     }
+    @PostMapping("/add-department")
+    public SuccessResponse<Department> addDepartment(@RequestBody Department department) {
+        System.out.println("Entering the department");
+        return userService.addDepartment(department);
+    }
+
+    @PostMapping("/add-role")
+    public SuccessResponse<Role> addRole(@RequestBody RoleDTO roleDTO) {
+        System.out.println("Entering the controller");
+        return userService.addRole(roleDTO);
+    }
+
 
 
 
