@@ -10,12 +10,12 @@ import com.erp.UserManagement.Repository.RoleRepository;
 import com.erp.UserManagement.Repository.UserRepository;
 import com.erp.UserManagement.Response.SuccessResponse;
 import com.erp.UserManagement.Service.UserService;
-import com.erp.UserManagement.dto.AssignRoleDepartmentRequest;
-import com.erp.UserManagement.dto.RoleDTO;
-import com.erp.UserManagement.dto.UserDto;
-import com.erp.UserManagement.dto.UserResponseDto;
+import com.erp.UserManagement.dto.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -81,8 +81,6 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
-
-
     @Override
     public SuccessResponse<Department> addDepartment(Department department) {
         System.out.printf("Department1111111 ");
@@ -92,17 +90,14 @@ public class UserServiceImpl implements UserService {
         SuccessResponse response=new SuccessResponse<>();
         response.setData(departments);
         response.setStatusCode(200);
-        response.setStatusMessage("Department has been added successfully");
+        response.setStatusMessage("Success");
         return response;
     }
 
-
     @Override
     public SuccessResponse<Role> addRole(RoleDTO roleDTO) {
-        System.out.println("ROLE DTOOOO : " + roleDTO);
         Department department = departmentRepository.findById(roleDTO.getDept_id())
                 .orElseThrow(() -> new RuntimeException("Department not found"));
-        System.out.println("111111111111deafafe : " + department);
         Role roles = new Role();
         roles.setName(roleDTO.getRoleName());
         roles.setDepartment(department);
@@ -110,7 +105,45 @@ public class UserServiceImpl implements UserService {
         SuccessResponse successResponse=new SuccessResponse<>();
         successResponse.setData(roles);
         successResponse.setStatusCode(200);
-        successResponse.setStatusMessage("Role has been added successfully");
+        successResponse.setStatusMessage("Success");
         return successResponse;
     }
+
+
+    @Override
+    public SuccessResponse<List<Department>> getAllDepartments() {
+        List<Department> departments = departmentRepository.findAll();
+        SuccessResponse<List<Department>> response = new SuccessResponse<>();
+        response.setData(departments);
+        response.setStatusCode(200);
+        response.setStatusMessage("Success");
+        return response;
+    }
+
+    @Override
+    public SuccessResponse<List<RoleDTO>> getRolesByDepartment(Integer departmentId) {
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new RuntimeException("Department not found"));
+
+        List<Role> roles = roleRepository.findByDepartment(department);
+
+        // Map Role objects to RoleDTO, excluding dept_id in the response
+        List<RoleDTO> roleResponseList = roles.stream()
+                .map(role -> new RoleDTO(
+                        role.getId(),
+                        role.getName(),
+                        null // Set dept_id as null since we don't want it in the response
+                ))
+                .collect(Collectors.toList());
+
+        SuccessResponse<List<RoleDTO>> response = new SuccessResponse<>();
+        response.setData(roleResponseList);
+        response.setStatusCode(200);
+        response.setStatusMessage("Success");
+
+        return response;
+    }
+
+
+
 }

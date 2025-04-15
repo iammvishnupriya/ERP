@@ -7,10 +7,7 @@ import com.erp.UserManagement.Response.SuccessResponse;
 import com.erp.UserManagement.Security.CustomUserDetailsService;
 import com.erp.UserManagement.Security.JwtUtil;
 import com.erp.UserManagement.Service.UserService;
-import com.erp.UserManagement.dto.AssignRoleDepartmentRequest;
-import com.erp.UserManagement.dto.RoleDTO;
-import com.erp.UserManagement.dto.UserDto;
-import com.erp.UserManagement.dto.UserResponseDto;
+import com.erp.UserManagement.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -54,11 +51,15 @@ public class UserController {
 
     @PostMapping("/add-role")
     public SuccessResponse<Role> addRole(@RequestBody RoleDTO roleDTO) {
-        System.out.println("Entering the controller");
         return userService.addRole(roleDTO);
     }
-
-
-
+    @GetMapping("/department")
+    public SuccessResponse<List<Department>> getAllDepartments() {
+        return userService.getAllDepartments();
+    }
+    @GetMapping("/roles")
+    public SuccessResponse<List<RoleDTO>> getRolesByDepartment(@RequestParam Integer departmentId) {
+        return userService.getRolesByDepartment(departmentId);
+    }
 
 }
