@@ -46,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtils;
     private ResetTokenRepository resetTokenRepository;
 
+    @Autowired
     public AuthServiceImpl(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserRepository userRepository, UserDetailsService userDetailsService, JavaMailSender mailSender, PasswordEncoder passwordEncoder, JwtUtil jwtUtils, ResetTokenRepository resetTokenRepository, String resetPasswordUrl) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
@@ -55,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.resetTokenRepository = resetTokenRepository;
-        this.resetPasswordUrl = resetPasswordUrl;
+       
     }
 
     private static final java.util.UUID UUID = java.util.UUID.randomUUID();
@@ -138,7 +139,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     private String generateResetToken() {
-        return java.util.UUID.randomUUID().toString(); // You can use JWT or other mechanisms for a more secure token
+        return java.util.UUID.randomUUID().toString(); 
     }
     private void sendResetPasswordEmail(User user, String token) {
         String resetLink = resetPasswordUrl + "?token=" + token;
@@ -184,7 +185,7 @@ public class AuthServiceImpl implements AuthService {
         }
         User user = resetToken.getUser();
 
-        user.setPassword(passwordEncoder.encode(newPassword));  // Encrypting the new password
+        user.setPassword(passwordEncoder.encode(newPassword));  
         userRepository.save(user);
         resetTokenRepository.delete(resetToken);
 
@@ -198,20 +199,13 @@ public class AuthServiceImpl implements AuthService {
 
 
     public void generateResetToken(User user) {
-        // Generate a random UUID as the token
         String token = UUID.randomUUID().toString();
-
-        // Create a new ResetToken entity
         ResetToken resetToken = new ResetToken();
         resetToken.setToken(token);
         resetToken.setUser(user);
         resetToken.setCreatedAt(LocalDateTime.now());
         resetToken.setExpirationTime(LocalDateTime.now().plusHours(1));  // Token expires in 1 hour
-
-        // Save the ResetToken entity in the database
         resetTokenRepository.save(resetToken);
-
-        // Send the token to the user via email or another method (not shown in this method)
         sendResetPasswordEmail(user, token);
     }
 
