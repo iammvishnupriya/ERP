@@ -6,7 +6,6 @@ import com.erp.UserManagement.dto.ChangePasswordRequest;
 import com.erp.UserManagement.dto.LoginRequest;
 import com.erp.UserManagement.dto.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

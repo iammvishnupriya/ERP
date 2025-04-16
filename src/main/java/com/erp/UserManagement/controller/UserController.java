@@ -2,17 +2,10 @@ package com.erp.UserManagement.controller;
 
 import com.erp.UserManagement.Model.Department;
 import com.erp.UserManagement.Model.Role;
-import com.erp.UserManagement.Model.User;
 import com.erp.UserManagement.Response.SuccessResponse;
-import com.erp.UserManagement.Security.CustomUserDetailsService;
-import com.erp.UserManagement.Security.JwtUtil;
 import com.erp.UserManagement.Service.UserService;
 import com.erp.UserManagement.dto.*;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,20 +25,8 @@ public class UserController {
         return ResponseEntity.ok(new SuccessResponse<>(200, "Success", registered));
     }
 
-    @PutMapping("/{userId}/assign-role-department")
-    public ResponseEntity<?> assignRoleAndDepartment(
-            @PathVariable int userId,
-            @RequestBody AssignRoleDepartmentRequest request) {
-
-        UserResponseDto responseDto = userService.assignRoleAndDepartment(userId, request);
-
-        return ResponseEntity.ok(
-                new SuccessResponse<>(200, "Role and department assigned successfully", responseDto)
-        );
-    }
     @PostMapping("/add-department")
     public SuccessResponse<Department> addDepartment(@RequestBody Department department) {
-        System.out.println("Entering the department");
         return userService.addDepartment(department);
     }
 
@@ -61,5 +42,17 @@ public class UserController {
     public SuccessResponse<List<RoleDTO>> getRolesByDepartment(@RequestParam Integer departmentId) {
         return userService.getRolesByDepartment(departmentId);
     }
+
+    @PostMapping("/assign-role-department")
+    public ResponseEntity<SuccessResponse<Object>> assignRoleAndDepartment(@RequestBody AssignRoleDepartmentRequest request) {
+        SuccessResponse<Object> response = userService.assignRoleAndDepartment(request);
+ 
+        if (response.getStatusCode() == 404) {
+            return ResponseEntity.status(404).body(response);
+        }
+ 
+        return ResponseEntity.ok(response);
+    }
+ 
 
 }
