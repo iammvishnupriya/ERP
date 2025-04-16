@@ -47,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
     private ResetTokenRepository resetTokenRepository;
 
     @Autowired
-    public AuthServiceImpl(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserRepository userRepository, UserDetailsService userDetailsService, JavaMailSender mailSender, PasswordEncoder passwordEncoder, JwtUtil jwtUtils, ResetTokenRepository resetTokenRepository, String resetPasswordUrl) {
+    public AuthServiceImpl(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserRepository userRepository, UserDetailsService userDetailsService, JavaMailSender mailSender, PasswordEncoder passwordEncoder, JwtUtil jwtUtils, ResetTokenRepository resetTokenRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
