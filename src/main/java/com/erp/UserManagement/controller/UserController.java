@@ -45,6 +45,7 @@ public class UserController {
 
     @PostMapping("/assign-role-department")
     public ResponseEntity<SuccessResponse<Object>> assignRoleAndDepartment(@RequestBody AssignRoleDepartmentRequest request) {
+        System.out.println("Enyering the cntrollerssd");
         SuccessResponse<Object> response = userService.assignRoleAndDepartment(request);
  
         if (response.getStatusCode() == 404) {
