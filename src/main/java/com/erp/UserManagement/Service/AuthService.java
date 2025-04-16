@@ -10,4 +10,7 @@ public interface AuthService {
     SuccessResponse<LoginResponse> login(LoginRequest request);
     SuccessResponse<Boolean> validateToken(String token);
     SuccessResponse<String> changePassword(ChangePasswordRequest request);
+    public SuccessResponse<String> resetPasswordRequest(int userId);
+    public SuccessResponse<String> resetPassword(String token, String newPassword, String confirmPassword);
+
 }

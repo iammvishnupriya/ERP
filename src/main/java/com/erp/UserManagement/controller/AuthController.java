@@ -2,10 +2,7 @@ package com.erp.UserManagement.controller;
 
 import com.erp.UserManagement.Response.SuccessResponse;
 import com.erp.UserManagement.Service.AuthService;
-import com.erp.UserManagement.dto.ChangePasswordRequest;
-import com.erp.UserManagement.dto.LoginRequest;
-import com.erp.UserManagement.dto.LoginResponse;
-import com.erp.UserManagement.dto.UserResponseDto;
+import com.erp.UserManagement.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +35,22 @@ public class AuthController {
     @PostMapping("/change-password")
     public SuccessResponse<String> updatePassword(@RequestBody ChangePasswordRequest request) {
         return authService.changePassword(request);
+    }
+    @PostMapping("/reset-password-request/{userId}")
+    public ResponseEntity<SuccessResponse<String>> resetPasswordRequest(@PathVariable int userId) {
+        SuccessResponse<String> response = authService.resetPasswordRequest(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    // Reset Password
+    @PostMapping("/reset-password")
+    public SuccessResponse<String> resetPassword(
+            @RequestParam("token") String token,
+            @RequestBody PasswordResetRequest passwordResetRequest) {
+
+        return authService.resetPassword(token,
+                passwordResetRequest.getNewPassword(),
+                passwordResetRequest.getConfirmPassword());
     }
 
 
