@@ -1,10 +1,15 @@
 package com.erp.UserManagement.dto;
 
+import com.erp.UserManagement.Model.Department;
+import com.erp.UserManagement.Model.Role;
+
 public class UserResponseDto {
     private String name;
     private String email;
     private String phone;
     private String address;
+    private String roleName;
+    private String departmentName;
 
     public String getName() {
         return name;
@@ -38,4 +43,19 @@ public class UserResponseDto {
         this.address = address;
     }
 
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
 }

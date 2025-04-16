@@ -156,6 +156,16 @@ public class UserServiceImpl implements UserService {
         dto.setPhone(user.getPhone());
         dto.setAddress(user.getAddress());
 
+        if (user.getRole() != null) {
+            dto.setRoleName(user.getRole().getName());
+        }
+
+        if (user.getDepartment() != null) {
+            dto.setDepartmentName(user.getDepartment().getName());
+        }
+
+
+
         return new SuccessResponse<>(200, "User details fetched", dto);
     }
 
