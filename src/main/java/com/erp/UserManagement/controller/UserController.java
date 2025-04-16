@@ -28,21 +28,28 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<SuccessResponse<UserResponseDto>> register(@RequestBody UserDto userDto) {
+
+        String email = userDto.getEmail();
+
+
+        if (email == null || email.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(new SuccessResponse<>(400, "Email cannot be null or blank", null));
+        }
+
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            return ResponseEntity.badRequest().body(new SuccessResponse<>(400, "Invalid email format", null));
+        }
+
+        if (userService.emailExists(email)) {
+            return ResponseEntity.badRequest().body(new SuccessResponse<>(400, "Email already registered", null));
+        }
+
         UserResponseDto registered = userService.registerUser(userDto);
         return ResponseEntity.ok(new SuccessResponse<>(200, "Success", registered));
     }
 
-    @PutMapping("/{userId}/assign-role-department")
-    public ResponseEntity<?> assignRoleAndDepartment(
-            @PathVariable int userId,
-            @RequestBody AssignRoleDepartmentRequest request) {
 
-        UserResponseDto responseDto = userService.assignRoleAndDepartment(userId, request);
 
-        return ResponseEntity.ok(
-                new SuccessResponse<>(200, "Role and department assigned successfully", responseDto)
-        );
-    }
     @PostMapping("/add-department")
     public SuccessResponse<Department> addDepartment(@RequestBody Department department) {
         System.out.println("Entering the department");
@@ -61,5 +68,7 @@ public class UserController {
     public SuccessResponse<List<RoleDTO>> getRolesByDepartment(@RequestParam Integer departmentId) {
         return userService.getRolesByDepartment(departmentId);
     }
+
+
 
 }

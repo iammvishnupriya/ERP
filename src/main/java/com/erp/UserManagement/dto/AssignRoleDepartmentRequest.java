@@ -2,8 +2,18 @@ package com.erp.UserManagement.dto;
 
 
 public class AssignRoleDepartmentRequest {
+    private int userId;
     private int roleId;
-    private String departmentName;
+    private int deptId;
+
+    // Getters and Setters
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
     public int getRoleId() {
         return roleId;
@@ -13,11 +23,11 @@ public class AssignRoleDepartmentRequest {
         this.roleId = roleId;
     }
 
-    public String getDepartmentName() {
-        return departmentName;
+    public int getDeptId() {
+        return deptId;
     }
 
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
+    public void setDeptId(int deptId) {
+        this.deptId = deptId;
     }
 }
