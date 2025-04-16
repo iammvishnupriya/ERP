@@ -13,9 +13,12 @@ public class AdminController {
     private AdminService adminService;
     @GetMapping("/users")
     public SuccessResponse<List<UserDto>> getAllUsers() {
-        List<UserDto> userList = adminService.getAllUsersForAdmin();
-        return new SuccessResponse<>(200, "Users fetched successfully", userList);
+        return adminService.getAllUsersForAdmin();
     }
- 
+    @DeleteMapping("/user/delete")
+    public SuccessResponse<String> deleteUser(@RequestParam int userId) {
+        return adminService.softDeleteUserById(userId);
+    }
+
 }
  
