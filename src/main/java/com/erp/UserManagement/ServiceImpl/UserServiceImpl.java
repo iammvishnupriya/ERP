@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
         roles.setDepartment(department);
         roleRepository.save(roles);
         SuccessResponse<Role> successResponse=new SuccessResponse<>();
-        successResponse.setData(null);
+        successResponse.setData(roles);
         successResponse.setStatusCode(200);
         successResponse.setStatusMessage("Success");
         return successResponse;
