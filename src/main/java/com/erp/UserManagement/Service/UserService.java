@@ -17,3 +17,7 @@ public interface UserService {
     SuccessResponse<Object> assignRoleAndDepartment(AssignRoleDepartmentRequest request);
     SuccessResponse<UserResponseDto> editUser(int userId);
 }
+
+
+
+
