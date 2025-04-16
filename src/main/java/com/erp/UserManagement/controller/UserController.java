@@ -54,6 +54,16 @@ public class UserController {
  
         return ResponseEntity.ok(response);
     }
- 
+
+    @GetMapping("/edit-user")
+    public ResponseEntity<SuccessResponse<UserResponseDto>> editUser(@RequestParam int userId) {
+        SuccessResponse<UserResponseDto> response = userService.editUser(userId);
+        return ResponseEntity.status(response.getStatusCode()).body(response);
+    }
+
+
+
+
+
 
 }

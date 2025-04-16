@@ -141,6 +141,24 @@ public class UserServiceImpl implements UserService {
         return new SuccessResponse<>(200, "Role and Department assigned successfully", user);
     }
 
+    @Override
+    public SuccessResponse<UserResponseDto> editUser(int userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        if (optionalUser.isEmpty()) {
+            return new SuccessResponse<>(404, "User not found", null);
+        }
+
+        User user = optionalUser.get();
+        UserResponseDto dto = new UserResponseDto();
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setPhone(user.getPhone());
+        dto.setAddress(user.getAddress());
+
+        return new SuccessResponse<>(200, "User details fetched", dto);
+    }
+
 
 
 

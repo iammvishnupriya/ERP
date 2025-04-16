@@ -5,7 +5,9 @@ import com.erp.UserManagement.Service.AuthService;
 import com.erp.UserManagement.dto.ChangePasswordRequest;
 import com.erp.UserManagement.dto.LoginRequest;
 import com.erp.UserManagement.dto.LoginResponse;
+import com.erp.UserManagement.dto.UserResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,4 +39,7 @@ public class AuthController {
     public SuccessResponse<String> updatePassword(@RequestBody ChangePasswordRequest request) {
         return authService.changePassword(request);
     }
+
+
+
 }

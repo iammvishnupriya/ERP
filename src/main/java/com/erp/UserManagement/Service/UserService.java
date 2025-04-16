@@ -15,6 +15,8 @@ public interface UserService {
     SuccessResponse<List<Department>> getAllDepartments();
     SuccessResponse<List<RoleDTO>> getRolesByDepartment(Integer departmentId);
     SuccessResponse<Object> assignRoleAndDepartment(AssignRoleDepartmentRequest request);
+    SuccessResponse<UserResponseDto> editUser(int userId);
+
 
 
 
