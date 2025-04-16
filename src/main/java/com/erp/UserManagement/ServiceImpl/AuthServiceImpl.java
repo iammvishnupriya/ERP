@@ -58,20 +58,6 @@ public class AuthServiceImpl implements AuthService {
         this.resetPasswordUrl = resetPasswordUrl;
     }
 
-    @Autowired
-    public AuthServiceImpl(AuthenticationManager authenticationManager,
-                           JwtUtil jwtUtil,
-                           UserRepository userRepository,
-                           UserDetailsService userDetailsService, JavaMailSender mailSender, PasswordEncoder passwordEncoder, JwtUtil jwtUtils, ResetTokenRepository resetTokenRepository) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-        this.userDetailsService = userDetailsService;
-        this.mailSender = mailSender;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtils = jwtUtils;
-        this.resetTokenRepository = resetTokenRepository;
-    }
     private static final java.util.UUID UUID = java.util.UUID.randomUUID();
     @Value("${app.reset-password.url}")
     private String resetPasswordUrl;
