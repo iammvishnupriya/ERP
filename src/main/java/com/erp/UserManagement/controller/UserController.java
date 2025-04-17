@@ -21,9 +21,16 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<SuccessResponse<UserResponseDto>> register(@RequestBody UserDto userDto) {
-        UserResponseDto registered = userService.registerUser(userDto);
-        return ResponseEntity.ok(new SuccessResponse<>(200, "Success", registered));
+        try {
+            userService.validateEmail(userDto.getEmail());
+            UserResponseDto registered = userService.registerUser(userDto);
+            return ResponseEntity.ok(new SuccessResponse<>(200, "Success", registered));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(new SuccessResponse<>(400, ex.getMessage(), null));
+        }
     }
+
+
 
     @PostMapping("/add-department")
     public SuccessResponse<Department> addDepartment(@RequestBody Department department) {

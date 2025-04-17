@@ -54,6 +54,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean emailExists(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    @Override
+    public void validateEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be null or blank");
+        }
+
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
+        if (emailExists(email)) {
+            throw new IllegalArgumentException("Email already registered");
+        }
+    }
+
+
+
+    @Override
     public SuccessResponse<Department> addDepartment(Department department) {
         System.out.printf("Department1111111 ");
         Department departments = new Department();

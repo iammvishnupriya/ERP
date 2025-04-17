@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface UserService {
     UserResponseDto registerUser(UserDto userDto);
+    boolean emailExists(String email);
+    void validateEmail(String email);
     SuccessResponse<Department> addDepartment(Department department);
     SuccessResponse<Role> addRole(RoleDTO roleDTO);
     SuccessResponse<List<Department>> getAllDepartments();
