@@ -15,6 +15,7 @@ import com.erp.UserManagement.dto.LoginResponse;
 import com.erp.UserManagement.dto.UserDto;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -125,29 +126,37 @@ public class AuthServiceImpl implements AuthService {
         return new SuccessResponse<>(200, "Password updated successfully", null);
     }
 
+
+
     @Override
-    public SuccessResponse<String> resetPasswordRequest(int userId) {
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isEmpty()) {
-            throw new RuntimeException("User not found");
+    public SuccessResponse<String> resetPasswordRequest(String email, HttpSession session) {
+        if (!isValidEmail(email)) {
+            return new SuccessResponse<>(200, "Invalid mail", null);
         }
+
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            return new SuccessResponse<>(200, "Not a User Mail", null);
+        }
+
+        // Store email in session
+        session.setAttribute("forgotEmail", email);
+
         User user = userOpt.get();
-        generateResetToken(user);
+        sendResetPasswordEmail(user);
 
         return new SuccessResponse<>(200, "Password reset link sent successfully", null);
     }
 
 
-    private String generateResetToken() {
-        return java.util.UUID.randomUUID().toString(); 
-    }
-    private void sendResetPasswordEmail(User user, String token) {
-        String resetLink = resetPasswordUrl + "?token=" + token;
+
+    private void sendResetPasswordEmail(User user) {
+        String resetLink = "http://localhost:5182/email-forgot-password";
 
         String subject = "Password Reset Request";
-        String content = "<p>Hello Dear,</p>"
+        String content = "<p>Hello " + user.getName() + ",</p>"
                 + "<p>You have requested to reset your password.</p>"
-                + "<p>Click the link below link to reset it:</p>"
+                + "<p>Click the link below to reset it:</p>"
                 + "<p><a href=\"" + resetLink + "\">Reset Password</a></p>"
                 + "<br><p>If you did not request this, please ignore this email.</p>";
 
@@ -165,50 +174,44 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Failed to send email", e);
         }
     }
-
     @Override
-    public SuccessResponse<String> resetPassword(String token, String newPassword, String confirmPassword) {
+    public SuccessResponse<String> resetPassword(String newPassword, String confirmPassword, HttpSession session) {
         if (!newPassword.equals(confirmPassword)) {
             throw new RuntimeException("Passwords do not match");
         }
+
         if (!isValidPassword(newPassword)) {
-            throw new RuntimeException("Password must be at least 6 characters long, contain one special character, one uppercase letter, one lowercase letter, and one digit");
-        }
-        Optional<ResetToken> tokenOpt = resetTokenRepository.findByToken(token);
-        if (tokenOpt.isEmpty()) {
-            throw new RuntimeException("Invalid token");
+            throw new RuntimeException("Password must be at least 6 characters long, "
+                    + "contain one special character, one uppercase letter, one lowercase letter, and one digit");
         }
 
-        ResetToken resetToken = tokenOpt.get();
-        if (resetToken.isExpired()) {
-            throw new RuntimeException("Token has expired");
+        String email = (String) session.getAttribute("forgotEmail");
+        if (email == null) {
+            throw new RuntimeException("Email not found in session. Please initiate reset password again.");
         }
-        User user = resetToken.getUser();
 
-        user.setPassword(passwordEncoder.encode(newPassword));  
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            throw new RuntimeException("No user found with this email");
+        }
+
+        User user = userOpt.get();
+        user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-        resetTokenRepository.delete(resetToken);
+
+        // Clear session after successful reset
+        session.removeAttribute("forgotEmail");
 
         return new SuccessResponse<>(200, "Password reset successfully", null);
     }
-
     private boolean isValidPassword(String password) {
         Pattern pattern = Pattern.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>]).{6,}$");
         return pattern.matcher(password).matches();
     }
-
-
-    public void generateResetToken(User user) {
-        String token = UUID.randomUUID().toString();
-        ResetToken resetToken = new ResetToken();
-        resetToken.setToken(token);
-        resetToken.setUser(user);
-        resetToken.setCreatedAt(LocalDateTime.now());
-        resetToken.setExpirationTime(LocalDateTime.now().plusHours(1));  // Token expires in 1 hour
-        resetTokenRepository.save(resetToken);
-        sendResetPasswordEmail(user, token);
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email != null && email.matches(emailRegex);
     }
-
 
 }
 
