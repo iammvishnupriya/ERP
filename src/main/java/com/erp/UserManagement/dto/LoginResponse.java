@@ -7,9 +7,9 @@ public class LoginResponse {
     private String token;
     private String email;
     private String role;
-    private Department department;
+    private String department;
 
-    public LoginResponse(String token, String email, String role, Department department) {
+    public LoginResponse(String token, String email, String role,   String department) {
         this.token = token;
         this.email = email;
         this.role = role;
@@ -40,11 +40,11 @@ public class LoginResponse {
         this.role = role;
     }
 
-    public Department getDepartment() {
+    public String getDepartment() {
         return department;
     }
 
-    public void setDepartment(Department department) {
+    public void setDepartment(String department) {
         this.department = department;
     }
 }

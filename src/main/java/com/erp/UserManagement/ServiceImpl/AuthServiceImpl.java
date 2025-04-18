@@ -87,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
                 token,
                 user.getEmail(),
                 user.getRole() != null ? user.getRole().getName() : null,
-                user.getDepartment()
+                user.getDepartment().getName()
         );
 
         return new SuccessResponse<>(200, "Login successful", response);
