@@ -1,5 +1,4 @@
 package com.erp.UserManagement.ServiceImpl;
-
 import com.erp.UserManagement.Enum.UserStatus;
 import com.erp.UserManagement.Model.ResetToken;
 import com.erp.UserManagement.Model.User;
@@ -31,8 +30,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -59,12 +56,14 @@ public class AuthServiceImpl implements AuthService {
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.resetTokenRepository = resetTokenRepository;
-       
+
     }
 
     private static final java.util.UUID UUID = java.util.UUID.randomUUID();
+
     @Value("${app.reset-password.url}")
     private String resetPasswordUrl;
+
     @Override
     public SuccessResponse<LoginResponse> login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
@@ -73,7 +72,6 @@ public class AuthServiceImpl implements AuthService {
         if (user == null) {
             return new SuccessResponse<>(404, "User not found", null);
         }
-
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -95,8 +93,6 @@ public class AuthServiceImpl implements AuthService {
         return new SuccessResponse<>(200, "Login successful", response);
     }
 
-
-
     @Override
     public SuccessResponse<Boolean> validateToken(String token) {
         try {
@@ -104,9 +100,9 @@ public class AuthServiceImpl implements AuthService {
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
             boolean isValid = jwtUtil.validateToken(token, userDetails);
-            return new SuccessResponse<>(200,"Token validation result", isValid);
+            return new SuccessResponse<>(200, "Token validation result", isValid);
         } catch (Exception e) {
-            return new SuccessResponse<>(200,"Invalid token", false);
+            return new SuccessResponse<>(200, "Invalid token", false);
         }
     }
 
@@ -129,100 +125,99 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<SuccessResponse<String>> resetPasswordRequest(String email, HttpSession session) {
+    public SuccessResponse<String> resetPasswordRequest(String email) {
         if (!isValidEmail(email)) {
-            return new ResponseEntity<>(
-                    new SuccessResponse<>(400, "Invalid mail", null),
-                    HttpStatus.BAD_REQUEST
-            );
+            return new SuccessResponse<>(400, "Invalid mail", null);
         }
 
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
-            return new ResponseEntity<>(
-                    new SuccessResponse<>(403, "Not a User Mail", null),
-                    HttpStatus.FORBIDDEN
-            );
+            return new SuccessResponse<>(403, "Not a User Mail", null);
         }
 
-        // Store email in session
-        session.setAttribute("forgotEmail", email);
-
         User user = userOpt.get();
-        sendResetPasswordEmail(user);
 
-        return new ResponseEntity<>(
-                new SuccessResponse<>(200, "Password reset link sent successfully", null),
-                HttpStatus.OK
-        );
+
+        String token = UUID.randomUUID().toString();
+
+
+        ResetToken resetToken = new ResetToken();
+        resetToken.setToken(token);
+        resetToken.setUser(user);
+        resetToken.setCreatedAt(LocalDateTime.now());
+        resetToken.setExpirationTime(LocalDateTime.now().plusHours(1));
+        resetTokenRepository.save(resetToken);
+
+
+        sendResetPasswordEmail(user, token);
+
+        return new SuccessResponse<>(200, "Password reset link sent successfully", null);
     }
 
-
-
-    private void sendResetPasswordEmail(User user) {
-        String resetLink = "http://localhost:5182/email-forgot-password";
-
+    private void sendResetPasswordEmail(User user, String token) {
+        String resetLink = resetPasswordUrl + "?token=" + token;
         String subject = "Password Reset Request";
-        String content = "<p>Hello " + user.getName() + ",</p>"
+        String content = "<p>Hello Dear,</p>"
                 + "<p>You have requested to reset your password.</p>"
-                + "<p>Click the link below to reset it:</p>"
+                + "<p>Click the link below link to reset it:</p>"
                 + "<p><a href=\"" + resetLink + "\">Reset Password</a></p>"
                 + "<br><p>If you did not request this, please ignore this email.</p>";
-
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
             helper.setFrom("afreenaa685@gmail.com");
             helper.setTo(user.getEmail());
             helper.setSubject(subject);
             helper.setText(content, true);
-
             mailSender.send(message);
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to send email", e);
+
         }
+
     }
+
+
     @Override
-    public SuccessResponse<String> resetPassword(String newPassword, String confirmPassword, HttpSession session) {
+    public SuccessResponse<String> resetPassword(String token, String newPassword, String confirmPassword) {
         if (!newPassword.equals(confirmPassword)) {
-            throw new RuntimeException("Passwords do not match");
+            return new SuccessResponse<>(400, "Passwords do not match", null);
         }
 
         if (!isValidPassword(newPassword)) {
-            throw new RuntimeException("Password must be at least 6 characters long, "
-                    + "contain one special character, one uppercase letter, one lowercase letter, and one digit");
+            return new SuccessResponse<>(400,
+                    "Password must be at least 6 characters long, contain one special character, one uppercase, one lowercase, and one digit",
+                    null);
         }
 
-        String email = (String) session.getAttribute("forgotEmail");
-        if (email == null) {
-            throw new RuntimeException("Email not found in session. Please initiate reset password again.");
+        Optional<ResetToken> tokenOpt = resetTokenRepository.findByToken(token);
+        if (tokenOpt.isEmpty()) {
+            return new SuccessResponse<>(403, "Invalid token", null);
         }
 
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) {
-            throw new RuntimeException("No user found with this email");
+        ResetToken resetToken = tokenOpt.get();
+        if (resetToken.isExpired()) {
+            return new SuccessResponse<>(403, "Token has expired", null);
         }
 
-        User user = userOpt.get();
+        User user = resetToken.getUser();
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        // Clear session after successful reset
-        session.removeAttribute("forgotEmail");
+        resetTokenRepository.delete(resetToken);
 
         return new SuccessResponse<>(200, "Password reset successfully", null);
     }
+
+    // Utility method
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        return pattern.matcher(email).matches();
+    }
+
     private boolean isValidPassword(String password) {
         Pattern pattern = Pattern.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>]).{6,}$");
         return pattern.matcher(password).matches();
     }
-    private boolean isValidEmail(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-        return email != null && email.matches(emailRegex);
-    }
-
 }
-
-
-

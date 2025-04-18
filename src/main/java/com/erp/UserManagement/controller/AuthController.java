@@ -2,8 +2,8 @@ package com.erp.UserManagement.controller;
 import com.erp.UserManagement.Response.SuccessResponse;
 import com.erp.UserManagement.Service.AuthService;
 import com.erp.UserManagement.dto.*;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,22 +37,21 @@ public class AuthController {
         return authService.changePassword(request);
     }
 
-    @PostMapping("/reset-password-request")
-    public ResponseEntity<?> resetPasswordRequest(@RequestParam String email, HttpSession session) {
-    return authService.resetPasswordRequest(email, session);
-     }
-
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<SuccessResponse<String>> resetPassword(
-            @RequestBody PasswordResetRequest request,
-            HttpSession session) {
-
-        SuccessResponse<String> response = authService.resetPassword(
-                request.getNewPassword(),
-                request.getConfirmPassword(),
-                session
-        );
-        return ResponseEntity.ok(response);
+    @PostMapping("/forgot-password")
+    public SuccessResponse<String> requestReset(@RequestParam String email) {
+        return authService.resetPasswordRequest(email);
     }
+
+    @PostMapping("/reset")
+    public ResponseEntity<SuccessResponse<String>> resetPassword(
+            @RequestParam String token,
+            @RequestBody PasswordResetRequest passwordResetRequest
+    ) {
+        String newPassword = passwordResetRequest.getNewPassword();
+        String confirmPassword = passwordResetRequest.getConfirmPassword();
+
+        SuccessResponse<String> response = authService.resetPassword(token, newPassword, confirmPassword);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }
