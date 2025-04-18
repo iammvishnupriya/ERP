@@ -8,6 +8,8 @@ public class UserDto {
     private String password;
     private String phone;
     private String address;
+    private String role;
+    private String department;
 
     public int getId() {
         return id;
@@ -55,5 +57,21 @@ public class UserDto {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 }
