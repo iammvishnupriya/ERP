@@ -18,10 +18,8 @@ public class CorsConfig {
 
         // ✅ Allow any origin from localhost or any domain (regardless of port)
         config.setAllowedOriginPatterns(List.of(
-                "http://localhost:*",
-                "http://127.0.0.1:*",
-                "https://*.prod.com",
-                "http://*.dev.com"
+                "http://localhost:3000", 
+                "http://127.0.0.1:3000"
         ));
 
         config.setAllowedHeaders(List.of("*"));
