@@ -1,5 +1,4 @@
 package com.erp.UserManagement.controller;
-
 import com.erp.UserManagement.Response.SuccessResponse;
 import com.erp.UserManagement.Service.AuthService;
 import com.erp.UserManagement.dto.*;
@@ -37,29 +36,12 @@ public class AuthController {
     public SuccessResponse<String> updatePassword(@RequestBody ChangePasswordRequest request) {
         return authService.changePassword(request);
     }
-//    @PostMapping("/reset-password-request/{userId}")
-//    public ResponseEntity<SuccessResponse<String>> resetPasswordRequest(@PathVariable int userId) {
-//        SuccessResponse<String> response = authService.resetPasswordRequest(userId);
-//        return ResponseEntity.ok(response);
-//    }
-//
-//    @PostMapping("/reset-password")
-//    public SuccessResponse<String> resetPassword(
-//            @RequestParam("token") String token,
-//            @RequestBody PasswordResetRequest passwordResetRequest) {
-//
-//        return authService.resetPassword(token,
-//                passwordResetRequest.getNewPassword(),
-//                passwordResetRequest.getConfirmPassword());
-//    }
-@PostMapping("/reset-password-request")
-public ResponseEntity<SuccessResponse<String>> resetPasswordRequest(
-        @RequestParam("email") String email,
-        HttpSession session) {
 
-    SuccessResponse<String> response = authService.resetPasswordRequest(email, session);
-    return ResponseEntity.ok(response);
-}
+    @PostMapping("/reset-password-request")
+    public ResponseEntity<?> resetPasswordRequest(@RequestParam String email, HttpSession session) {
+    return authService.resetPasswordRequest(email, session);
+     }
+
 
     @PostMapping("/reset-password")
     public ResponseEntity<SuccessResponse<String>> resetPassword(
@@ -73,9 +55,4 @@ public ResponseEntity<SuccessResponse<String>> resetPasswordRequest(
         );
         return ResponseEntity.ok(response);
     }
-
-
-
-
-
 }

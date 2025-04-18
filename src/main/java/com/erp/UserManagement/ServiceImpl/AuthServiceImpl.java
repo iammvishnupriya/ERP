@@ -18,6 +18,8 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -126,17 +128,21 @@ public class AuthServiceImpl implements AuthService {
         return new SuccessResponse<>(200, "Password updated successfully", null);
     }
 
-
-
     @Override
-    public SuccessResponse<String> resetPasswordRequest(String email, HttpSession session) {
+    public ResponseEntity<SuccessResponse<String>> resetPasswordRequest(String email, HttpSession session) {
         if (!isValidEmail(email)) {
-            return new SuccessResponse<>(200, "Invalid mail", null);
+            return new ResponseEntity<>(
+                    new SuccessResponse<>(400, "Invalid mail", null),
+                    HttpStatus.BAD_REQUEST
+            );
         }
 
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
-            return new SuccessResponse<>(200, "Not a User Mail", null);
+            return new ResponseEntity<>(
+                    new SuccessResponse<>(403, "Not a User Mail", null),
+                    HttpStatus.FORBIDDEN
+            );
         }
 
         // Store email in session
@@ -145,7 +151,10 @@ public class AuthServiceImpl implements AuthService {
         User user = userOpt.get();
         sendResetPasswordEmail(user);
 
-        return new SuccessResponse<>(200, "Password reset link sent successfully", null);
+        return new ResponseEntity<>(
+                new SuccessResponse<>(200, "Password reset link sent successfully", null),
+                HttpStatus.OK
+        );
     }
 
 
