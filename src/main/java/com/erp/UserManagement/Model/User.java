@@ -34,9 +34,23 @@ public class User {
 
     public User() {}
 
+    public User(int id) {
+        this.id = id;
+    }
+
+    public User(int id, String name, String phone, String email, String address, String password, Role role, Department department, UserStatus status) {
+        this.id = id;
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+        this.password = password;
+        this.role = role;
+        this.department = department;
+        this.status = status;
+    }
 
 
-    // Getters and setters
 
 
     public int getId() {

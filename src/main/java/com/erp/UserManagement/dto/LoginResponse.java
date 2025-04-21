@@ -1,19 +1,27 @@
 package com.erp.UserManagement.dto;
 
 
-import com.erp.UserManagement.Model.Department;
-
 public class LoginResponse {
+    private int userId;
     private String token;
     private String email;
     private String role;
     private String department;
 
-    public LoginResponse(String token, String email, String role,   String department) {
+    public LoginResponse(int userId, String token, String email, String role, String department) {
+        this.userId = userId;
         this.token = token;
         this.email = email;
         this.role = role;
         this.department = department;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getToken() {
