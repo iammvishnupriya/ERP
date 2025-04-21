@@ -9,11 +9,11 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 
 public interface AuthService {
-    SuccessResponse<LoginResponse> login(LoginRequest request);
-    SuccessResponse<Boolean> validateToken(String token);
-    SuccessResponse<String> changePassword(ChangePasswordRequest request);
-    public SuccessResponse<String> resetPassword(String token, String newPassword, String confirmPassword) ;
-    public SuccessResponse<String> resetPasswordRequest(String email);
+    public ResponseEntity<SuccessResponse<LoginResponse>> login(LoginRequest request);
+    public ResponseEntity<SuccessResponse<Boolean>> validateToken(String authHeader);
+    public ResponseEntity<SuccessResponse<String>> changePassword(ChangePasswordRequest request);
+    public ResponseEntity<SuccessResponse<String>> resetPassword(String token, String newPassword, String confirmPassword);
+    public ResponseEntity<SuccessResponse<String>> resetPasswordRequest(String email);
 
 
     }

@@ -19,39 +19,40 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public SuccessResponse<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<SuccessResponse<LoginResponse>> login(@RequestBody LoginRequest request) {
         return authService.login(request);
     }
 
+
     @GetMapping("/validate")
-    public SuccessResponse<Boolean> validateToken(@RequestHeader("Authorization") String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return new SuccessResponse<>(200,"Invalid token header", false);
-        }
-        String token = authHeader.substring(7);
-        return authService.validateToken(token);
+    public ResponseEntity<SuccessResponse<Boolean>> validateToken(@RequestHeader("Authorization") String authHeader) {
+        return authService.validateToken(authHeader);
     }
 
+
     @PostMapping("/change-password")
-    public SuccessResponse<String> updatePassword(@RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<SuccessResponse<String>> updatePassword(@RequestBody ChangePasswordRequest request) {
         return authService.changePassword(request);
     }
 
+
     @PostMapping("/forgot-password")
-    public SuccessResponse<String> requestReset(@RequestParam String email) {
+    public ResponseEntity<SuccessResponse<String>> requestReset(@RequestParam String email) {
         return authService.resetPasswordRequest(email);
     }
+
 
     @PostMapping("/reset")
     public ResponseEntity<SuccessResponse<String>> resetPassword(
             @RequestParam String token,
             @RequestBody PasswordResetRequest passwordResetRequest
     ) {
-        String newPassword = passwordResetRequest.getNewPassword();
-        String confirmPassword = passwordResetRequest.getConfirmPassword();
-
-        SuccessResponse<String> response = authService.resetPassword(token, newPassword, confirmPassword);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return authService.resetPassword(
+                token,
+                passwordResetRequest.getNewPassword(),
+                passwordResetRequest.getConfirmPassword()
+        );
     }
+
 
 }
