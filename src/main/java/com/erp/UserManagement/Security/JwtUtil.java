@@ -52,13 +52,12 @@ public class JwtUtil {
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
-    // ✅ Validate token using User model (used in TokenController or AuthController)
     public boolean validateToken(String token, User user) {
         final String username = extractUsername(token);
         return username.equals(user.getEmail()) && !isTokenExpired(token);
     }
 
-    // ✅ Generate token using User model
+
     public String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
