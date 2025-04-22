@@ -1,12 +1,17 @@
 package com.erp.UserManagement.dto;
 
 
+import com.erp.UserManagement.Model.Department;
+import com.erp.UserManagement.Model.Role;
+
 public class UserDto {
     private int id;
     private String name;
     private String email;
     private String password;
     private String phone;
+    private String role; // changed from Role object to String
+    private String department;
     private String address;
 
     public int getId() {
@@ -15,6 +20,22 @@ public class UserDto {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     public String getName() {
