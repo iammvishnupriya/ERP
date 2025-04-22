@@ -33,20 +33,20 @@ public class UserController {
 
 
     @PostMapping("/add-department")
-    public SuccessResponse<Department> addDepartment(@RequestBody Department department) {
+    public  ResponseEntity<SuccessResponse<Department>> addDepartment(@RequestBody Department department) {
         return userService.addDepartment(department);
     }
 
     @PostMapping("/add-role")
-    public SuccessResponse<Role> addRole(@RequestBody RoleDTO roleDTO) {
+    public ResponseEntity<SuccessResponse<Role>> addRole(@RequestBody RoleDTO roleDTO) {
         return userService.addRole(roleDTO);
     }
     @GetMapping("/department")
-    public SuccessResponse<List<Department>> getAllDepartments() {
+    public ResponseEntity<SuccessResponse<List<Department>>> getAllDepartments() {
         return userService.getAllDepartments();
     }
     @GetMapping("/roles")
-    public SuccessResponse<List<RoleDTO>> getRolesByDepartment(@RequestParam Integer departmentId) {
+    public ResponseEntity<SuccessResponse<List<RoleDTO>>> getRolesByDepartment(@RequestParam Integer departmentId) {
         return userService.getRolesByDepartment(departmentId);
     }
 

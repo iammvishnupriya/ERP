@@ -10,6 +10,8 @@ import com.erp.UserManagement.Repository.UserRepository;
 import com.erp.UserManagement.Response.SuccessResponse;
 import com.erp.UserManagement.Service.UserService;
 import com.erp.UserManagement.dto.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -76,66 +78,108 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public SuccessResponse<Department> addDepartment(Department department) {
-        System.out.printf("Department1111111 ");
-        Department departments = new Department();
-        departments.setName(department.getName());
-        departmentRepository.save(departments);
-        SuccessResponse response=new SuccessResponse<>();
-        response.setData(departments);
-        response.setStatusCode(200);
-        response.setStatusMessage("Success");
-        return response;
+    public ResponseEntity<SuccessResponse<Department>> addDepartment(Department department) {
+        SuccessResponse<Department> response = new SuccessResponse<>();
+        try {
+            Department departments = new Department();
+            departments.setName(department.getName());
+            departmentRepository.save(departments);
+
+            response.setData(departments);
+            response.setStatusCode(200);
+            response.setStatusMessage("Success");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setStatusMessage("Failed to add department: " + e.getMessage());
+            response.setData(null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
-    public SuccessResponse<Role> addRole(RoleDTO roleDTO) {
-        Department department = departmentRepository.findById(roleDTO.getDept_id())
-                .orElseThrow(() -> new RuntimeException("Department not found"));
-        Role roles = new Role();
-        roles.setName(roleDTO.getRoleName());
-        roles.setDepartment(department);
-        roleRepository.save(roles);
-        SuccessResponse<Role> successResponse=new SuccessResponse<>();
-        successResponse.setData(roles);
-        successResponse.setStatusCode(200);
-        successResponse.setStatusMessage("Success");
-        return successResponse;
+    public ResponseEntity<SuccessResponse<Role>> addRole(RoleDTO roleDTO) {
+        SuccessResponse<Role> response = new SuccessResponse<>();
+        try {
+            Department department = departmentRepository.findById(roleDTO.getDept_id())
+                    .orElse(null);
+
+            if (department == null) {
+                response.setStatusCode(404);
+                response.setStatusMessage("Department not found");
+                response.setData(null);
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+
+            Role roles = new Role();
+            roles.setName(roleDTO.getRoleName());
+            roles.setDepartment(department);
+            roleRepository.save(roles);
+
+            response.setData(roles);
+            response.setStatusCode(200);
+            response.setStatusMessage("Success");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setStatusMessage("Failed to add role: " + e.getMessage());
+            response.setData(null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
-    public SuccessResponse<List<Department>> getAllDepartments() {
-        List<Department> departments = departmentRepository.findAll();
+    public ResponseEntity<SuccessResponse<List<Department>>> getAllDepartments() {
         SuccessResponse<List<Department>> response = new SuccessResponse<>();
-        response.setData(departments);
-        response.setStatusCode(200);
-        response.setStatusMessage("Success");
-        return response;
+        try {
+            List<Department> departments = departmentRepository.findAll();
+            response.setData(departments);
+            response.setStatusCode(200);
+            response.setStatusMessage("Success");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setStatusMessage("Failed to fetch departments: " + e.getMessage());
+            response.setData(null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
-    public SuccessResponse<List<RoleDTO>> getRolesByDepartment(Integer departmentId) {
-        Department department = departmentRepository.findById(departmentId)
-                .orElseThrow(() -> new RuntimeException("Department not found"));
-
-        List<Role> roles = roleRepository.findByDepartment(department);
-
-        // Map Role objects to RoleDTO, excluding dept_id in the response
-        List<RoleDTO> roleResponseList = roles.stream()
-                .map(role -> new RoleDTO(
-                        role.getId(),
-                        role.getName(),
-                        null // Set dept_id as null since we don't want it in the response
-                ))
-                .collect(Collectors.toList());
-
+    public ResponseEntity<SuccessResponse<List<RoleDTO>>> getRolesByDepartment(Integer departmentId) {
         SuccessResponse<List<RoleDTO>> response = new SuccessResponse<>();
-        response.setData(roleResponseList);
-        response.setStatusCode(200);
-        response.setStatusMessage("Success");
+        try {
+            Department department = departmentRepository.findById(departmentId)
+                    .orElse(null);
 
-        return response;
+            if (department == null) {
+                response.setStatusCode(404);
+                response.setStatusMessage("Department not found");
+                response.setData(null);
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+
+            List<Role> roles = roleRepository.findByDepartment(department);
+            List<RoleDTO> roleResponseList = roles.stream()
+                    .map(role -> new RoleDTO(role.getId(), role.getName(), null))
+                    .collect(Collectors.toList());
+
+            response.setData(roleResponseList);
+            response.setStatusCode(200);
+            response.setStatusMessage("Success");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setStatusMessage("Failed to fetch roles: " + e.getMessage());
+            response.setData(null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
     @Override
     public SuccessResponse<Object> assignRoleAndDepartment(AssignRoleDepartmentRequest request) {
