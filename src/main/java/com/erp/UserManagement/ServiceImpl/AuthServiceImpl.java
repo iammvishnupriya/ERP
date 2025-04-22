@@ -30,6 +30,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -174,14 +176,27 @@ public class AuthServiceImpl implements AuthService {
             return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
         }
 
-        // Assume sending reset token logic goes here...
+        User user = userOptional.get();
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(15);
+
+        ResetToken resetToken = new ResetToken();
+        resetToken.setToken(token);
+        resetToken.setExpirationTime(expiryDate);
+        resetToken.setCreatedAt(LocalDateTime.now());
+        resetToken.setUser(user);
+
+        resetTokenRepository.save(resetToken);
+
+
+        sendResetPasswordEmail(user, token);
 
         response.setStatusCode(200);
-        response.setStatusMessage("Password reset OTP sent successfully");
+        response.setStatusMessage("Reset email sent successfully");
         response.setData(email);
-
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
 
 
     private void sendResetPasswordEmail(User user, String token) {
