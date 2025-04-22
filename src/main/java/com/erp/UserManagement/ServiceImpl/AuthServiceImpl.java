@@ -89,10 +89,11 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtil.generateToken(user);
 
         LoginResponse loginResponse = new LoginResponse(
+                user.getId(),
                 token,
                 user.getEmail(),
                 user.getRole() != null ? user.getRole().getName() : null,
-                user.getDepartment()
+                user.getDepartment() != null ? user.getDepartment().getName() :null
         );
 
         response.setStatusCode(200);
