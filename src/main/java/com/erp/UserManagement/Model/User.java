@@ -87,7 +87,7 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
@@ -95,7 +95,7 @@ public class User {
         this.role = role;
     }
 
-    public String getDepartment() {
+    public Department getDepartment() {
         return department;
     }
 

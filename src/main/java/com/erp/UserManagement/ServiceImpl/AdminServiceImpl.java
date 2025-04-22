@@ -27,8 +27,18 @@ public class AdminServiceImpl implements AdminService {
             dto.setName(user.getName());
             dto.setEmail(user.getEmail());
             dto.setPhone(user.getPhone());
-            dto.setRole(user.getRole());
-            dto.setDepartment(user.getDepartment());
+            if (user.getRole() != null) {
+                dto.setRole(user.getRole().getName());
+            } else {
+                dto.setRole(null); // or set a default like "No Role"
+            }
+
+            // Safely set department name
+            if (user.getDepartment() != null) {
+                dto.setDepartment(user.getDepartment().getName());
+            } else {
+                dto.setDepartment(null); // or set a default like "No Department"
+            }
             dto.setAddress(user.getAddress());
             return dto;
         }).collect(Collectors.toList());
