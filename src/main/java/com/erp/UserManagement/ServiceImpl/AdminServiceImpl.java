@@ -27,6 +27,8 @@ public class AdminServiceImpl implements AdminService {
             dto.setName(user.getName());
             dto.setEmail(user.getEmail());
             dto.setPhone(user.getPhone());
+            dto.setRole(user.getRole());
+            dto.setDepartment(user.getDepartment());
             dto.setAddress(user.getAddress());
             return dto;
         }).collect(Collectors.toList());
