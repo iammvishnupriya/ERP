@@ -37,6 +37,7 @@ public class AuthController {
         return authService.changePassword(request);
     }
 
+
     @PostMapping("/forgot-password")
     public SuccessResponse<String> requestReset(@RequestParam String email) {
         return authService.resetPasswordRequest(email);
