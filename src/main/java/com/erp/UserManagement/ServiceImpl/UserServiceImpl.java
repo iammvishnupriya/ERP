@@ -246,8 +246,10 @@ public class UserServiceImpl implements UserService {
     public SuccessResponse<byte[]> generateExcel(List<Integer> userIds) {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
             List<User> users = userRepository.findAllById(userIds);
             Sheet sheet = workbook.createSheet("Users");
+
             Row headerRow = sheet.createRow(0);
             headerRow.createCell(0).setCellValue("Name");
             headerRow.createCell(1).setCellValue("Email");
@@ -259,12 +261,16 @@ public class UserServiceImpl implements UserService {
             int rowNum = 1;
             for (User user : users) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(user.getName());
-                row.createCell(1).setCellValue(user.getEmail());
-                row.createCell(2).setCellValue(user.getPhone());
-                row.createCell(3).setCellValue(user.getAddress());
-                row.createCell(4).setCellValue(user.getRole().getName());
-                row.createCell(5).setCellValue(user.getDepartment().getName());
+                row.createCell(0).setCellValue(user.getName() != null ? user.getName() : "");
+                row.createCell(1).setCellValue(user.getEmail() != null ? user.getEmail() : "");
+                row.createCell(2).setCellValue(user.getPhone() != null ? user.getPhone() : "");
+                row.createCell(3).setCellValue(user.getAddress() != null ? user.getAddress() : "");
+                row.createCell(4).setCellValue(
+                        user.getRole() != null && user.getRole().getName() != null ? user.getRole().getName() : "N/A"
+                );
+                row.createCell(5).setCellValue(
+                        user.getDepartment() != null && user.getDepartment().getName() != null ? user.getDepartment().getName() : "N/A"
+                );
             }
 
             workbook.write(outputStream);
