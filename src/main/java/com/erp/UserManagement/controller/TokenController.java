@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/token")
+@RequestMapping("/user_management/api/token")
 public class TokenController {
 
     private final JwtUtil jwtUtil;
