@@ -5,6 +5,9 @@ import com.erp.UserManagement.Model.Role;
 import com.erp.UserManagement.Response.SuccessResponse;
 import com.erp.UserManagement.Service.UserService;
 import com.erp.UserManagement.dto.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -68,6 +71,19 @@ public class UserController {
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
+    @GetMapping("/download/excel")
+    public ResponseEntity<byte[]> downloadExcel(@RequestParam List<Integer> userIds) {
+        try {
+            SuccessResponse<byte[]> response = userService.generateExcel(userIds);
+            return ResponseEntity.status(response.getStatusCode())
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=users.xlsx")
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(response.getData());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
 
 
 

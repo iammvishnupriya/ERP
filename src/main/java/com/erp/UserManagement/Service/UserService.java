@@ -19,6 +19,8 @@ public interface UserService {
     ResponseEntity<SuccessResponse<List<RoleDTO>>> getRolesByDepartment(Integer departmentId);
     SuccessResponse<Object> assignRoleAndDepartment(AssignRoleDepartmentRequest request);
     SuccessResponse<UserResponseDto> editUser(int userId);
+    SuccessResponse<byte[]> generateExcel(List<Integer> userIds);
+
 }
 
 
