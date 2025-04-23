@@ -90,6 +90,7 @@ public class AuthServiceImpl implements AuthService {
 
         LoginResponse loginResponse = new LoginResponse(
                 user.getId(),
+                user.getName(),
                 token,
                 user.getEmail(),
                 user.getRole() != null ? user.getRole().getName() : null,
