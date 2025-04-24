@@ -32,10 +32,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user_management/api/users/register").permitAll() // ✅ ADD THIS LINE
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/token/**").permitAll()
+                        .requestMatchers("/user_management/api/auth/**").permitAll() // ✅ OPTIONAL: If login also needs access
+                        .requestMatchers("user_management/api/token/**").permitAll()
                         .anyRequest().authenticated()
                 )
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         // Add JWT filter before the UsernamePasswordAuthenticationFilter

@@ -10,11 +10,17 @@ import com.erp.UserManagement.Repository.UserRepository;
 import com.erp.UserManagement.Response.SuccessResponse;
 import com.erp.UserManagement.Service.UserService;
 import com.erp.UserManagement.dto.*;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -235,6 +241,44 @@ public class UserServiceImpl implements UserService {
         return new SuccessResponse<>(200, "User details fetched", dto);
     }
 
+
+    @Override
+    public SuccessResponse<byte[]> generateExcel(List<Integer> userIds) {
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            List<User> users = userRepository.findAllById(userIds);
+            Sheet sheet = workbook.createSheet("Users");
+
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Name");
+            headerRow.createCell(1).setCellValue("Email");
+            headerRow.createCell(2).setCellValue("Phone");
+            headerRow.createCell(3).setCellValue("Address");
+            headerRow.createCell(4).setCellValue("Role");
+            headerRow.createCell(5).setCellValue("Department");
+
+            int rowNum = 1;
+            for (User user : users) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(user.getName() != null ? user.getName() : "");
+                row.createCell(1).setCellValue(user.getEmail() != null ? user.getEmail() : "");
+                row.createCell(2).setCellValue(user.getPhone() != null ? user.getPhone() : "");
+                row.createCell(3).setCellValue(user.getAddress() != null ? user.getAddress() : "");
+                row.createCell(4).setCellValue(
+                        user.getRole() != null && user.getRole().getName() != null ? user.getRole().getName() : "N/A"
+                );
+                row.createCell(5).setCellValue(
+                        user.getDepartment() != null && user.getDepartment().getName() != null ? user.getDepartment().getName() : "N/A"
+                );
+            }
+
+            workbook.write(outputStream);
+            return new SuccessResponse<>(200, "Excel file generated successfully", outputStream.toByteArray());
+        } catch (IOException e) {
+            return new SuccessResponse<>(500, "Failed to generate Excel file: " + e.getMessage(), null);
+        }
+    }
 
 
 
