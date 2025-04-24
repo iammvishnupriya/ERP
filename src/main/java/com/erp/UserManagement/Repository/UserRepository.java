@@ -13,7 +13,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
     List<User> findByStatus(UserStatus status);
-    
+    @Query("SELECT u FROM User u WHERE u.email = :email AND u.status = 'ACTIVE'")
+    Optional<User> findByEmailAndStatus(@Param("email") String email);
+
+
     @Query("SELECT u FROM User u WHERE u.status = :status AND " +
         "(LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
         "OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) " +
