@@ -6,6 +6,6 @@ import com.erp.UserManagement.dto.UserDto;
 import java.util.List;
  
 public interface AdminService {
-    public SuccessResponse<List<UserDto>> getAllUsersForAdmin();
+    public SuccessResponse<List<UserDto>> getAllUsersForAdmin(String search);
     public SuccessResponse<String> softDeleteUserById(int userId);
 }

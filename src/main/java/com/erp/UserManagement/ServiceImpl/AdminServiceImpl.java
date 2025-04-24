@@ -18,8 +18,13 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private UserRepository userRepository;
 
-    public SuccessResponse<List<UserDto>> getAllUsersForAdmin() {
-        List<User> users = userRepository.findByStatus(UserStatus.ACTIVE);
+    public SuccessResponse<List<UserDto>> getAllUsersForAdmin(String search) {
+        List<User> users = null;
+        if (search != null && !search.isEmpty()) {
+            users = userRepository.searchByStatusAndKeyword(UserStatus.ACTIVE, search);
+        } else {
+            users = userRepository.findByStatus(UserStatus.ACTIVE);
+        }
 
         List<UserDto> userDtoList = users.stream().map(user -> {
             UserDto dto = new UserDto();
